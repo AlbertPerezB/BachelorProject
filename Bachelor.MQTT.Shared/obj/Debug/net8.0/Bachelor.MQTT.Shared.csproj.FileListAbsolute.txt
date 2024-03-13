@@ -1,0 +1,12 @@
+C:\Users\Albert\Documents\GitHub\Bachelor\Bachelor.MQTT.Shared\bin\Debug\net8.0\Bachelor.MQTT.Shared.deps.json
+C:\Users\Albert\Documents\GitHub\Bachelor\Bachelor.MQTT.Shared\bin\Debug\net8.0\Bachelor.MQTT.Shared.dll
+C:\Users\Albert\Documents\GitHub\Bachelor\Bachelor.MQTT.Shared\bin\Debug\net8.0\Bachelor.MQTT.Shared.pdb
+C:\Users\Albert\Documents\GitHub\Bachelor\Bachelor.MQTT.Shared\obj\Debug\net8.0\Bachelor.MQTT.Shared.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Albert\Documents\GitHub\Bachelor\Bachelor.MQTT.Shared\obj\Debug\net8.0\Bachelor.MQTT.Shared.AssemblyInfoInputs.cache
+C:\Users\Albert\Documents\GitHub\Bachelor\Bachelor.MQTT.Shared\obj\Debug\net8.0\Bachelor.MQTT.Shared.AssemblyInfo.cs
+C:\Users\Albert\Documents\GitHub\Bachelor\Bachelor.MQTT.Shared\obj\Debug\net8.0\Bachelor.MQTT.Shared.csproj.CoreCompileInputs.cache
+C:\Users\Albert\Documents\GitHub\Bachelor\Bachelor.MQTT.Shared\obj\Debug\net8.0\Bachelor.MQTT.Shared.sourcelink.json
+C:\Users\Albert\Documents\GitHub\Bachelor\Bachelor.MQTT.Shared\obj\Debug\net8.0\Bachelor.MQTT.Shared.dll
+C:\Users\Albert\Documents\GitHub\Bachelor\Bachelor.MQTT.Shared\obj\Debug\net8.0\refint\Bachelor.MQTT.Shared.dll
+C:\Users\Albert\Documents\GitHub\Bachelor\Bachelor.MQTT.Shared\obj\Debug\net8.0\Bachelor.MQTT.Shared.pdb
+C:\Users\Albert\Documents\GitHub\Bachelor\Bachelor.MQTT.Shared\obj\Debug\net8.0\ref\Bachelor.MQTT.Shared.dll
