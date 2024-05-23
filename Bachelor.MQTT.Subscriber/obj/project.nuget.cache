@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "FDG9Qi31BtvYNS8tA4/uGeryTUoctZ14CeAaKgaxhZRU5e8NKfV0aBug0uSvkno2K2vuIM0CvZSrFeEQ2NdLFg==",
+  "dgSpecHash": "gJSsF3x4JembOeOFQ9IYdSymMWUAK6R/8UKMvl5xkG9t+4mmYsh+t1D9j3WRWYQyN0SJPaNViw3id3S91QnM5Q==",
   "success": true,
-  "projectFilePath": "C:\\Users\\Albert\\Documents\\GitHub\\BachelorProject\\Bachelor.MQTT.Subscriber\\Bachelor.MQTT.Subscriber.csproj",
+  "projectFilePath": "c:\\Users\\Albert\\OneDrive\\Documents\\GitHub\\BachelorProject\\Bachelor.MQTT.Subscriber\\Bachelor.MQTT.Subscriber.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Albert\\.nuget\\packages\\hivemqtt\\0.10.2\\hivemqtt.0.10.2.nupkg.sha512",
     "C:\\Users\\Albert\\.nuget\\packages\\microsoft.extensions.configuration\\8.0.0\\microsoft.extensions.configuration.8.0.0.nupkg.sha512",

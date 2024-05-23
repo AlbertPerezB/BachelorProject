@@ -11,7 +11,7 @@ public static class RandomEvent
     public static DCRevent GetRandomEvent(DCRevent[] events)
     {
         var randomlist = new List<DCRevent>();
-        foreach (var item in events)
+        foreach (var item in events.Where(p => p.Enabled))
         {
             randomlist.AddRange(Enumerable.Repeat(item, GetWeight(item)));
         }

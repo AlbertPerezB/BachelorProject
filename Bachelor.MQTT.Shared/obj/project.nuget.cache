@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "pHoqBpG33qsS/+h9Zgg5p9aEEF0tI32it04Kvx3H7zi0JUaoo7HI2r/NOXJWUOCgUKDiKtjlTAL/B0ph1kImag==",
+  "dgSpecHash": "CooMftmiHj3XaTjXTt2jl2YMZWbKxhkriMRtVNeouY2b3wIUR72QH9mVyp7VB0Yrc6ZZO6SqikIau3ZQCF24Gw==",
   "success": true,
-  "projectFilePath": "C:\\Users\\Albert\\Documents\\GitHub\\BachelorProject\\Bachelor.MQTT.Shared\\Bachelor.MQTT.Shared.csproj",
+  "projectFilePath": "c:\\Users\\Albert\\OneDrive\\Documents\\GitHub\\BachelorProject\\Bachelor.MQTT.Shared\\Bachelor.MQTT.Shared.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }

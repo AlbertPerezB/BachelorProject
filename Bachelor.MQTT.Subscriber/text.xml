@@ -1,0 +1,77 @@
+<events nextDelay="None" nextDeadline="None" isAccepting="True"
+    currentTime="2024-05-23T11:21:28.7315844+00:00" currentPhase="">
+    <event id="amount" included="true" enabled="true" pending="false" EffectivelyPending="false"
+        EffectivelyIncluded="true" executed="false" fullPath="amount" roles="" groups=""
+        description="" label="Transaktion" eventType="" phases="" deadline="" sequence="14"
+        parent="" type="" referId="">
+        <eventTypeData></eventTypeData>
+    </event>
+    <event id="hvidvask" included="true" enabled="true" pending="false" EffectivelyPending="false"
+        EffectivelyIncluded="true" executed="false" fullPath="hvidvask" roles="Bankr&#229;dgiver"
+        groups="" description="" label="Mistanke om hvidvask" eventType="" phases="" deadline=""
+        sequence="6" parent="" type="" referId="">
+        <eventTypeData></eventTypeData>
+    </event>
+    <event id="KYC" included="true" enabled="true" pending="false" EffectivelyPending="false"
+        EffectivelyIncluded="true" executed="false" fullPath="KYC" roles="Robot" groups=""
+        description="" label="Kundekendskabs- procedure" eventType="" phases="" deadline=""
+        sequence="11" parent="" type="" referId="">
+        <eventTypeData></eventTypeData>
+    </event>
+    <event id="KYC_ACTIVITY" included="true" enabled="true" pending="false"
+        EffectivelyPending="false" EffectivelyIncluded="true" executed="false"
+        fullPath="KYC_ACTIVITY" roles="Bankr&#229;dgiver" groups="" description=""
+        label="Udf&#248;r KYC" eventType="" phases="" deadline="" sequence="12" parent="" type=""
+        referId="">
+        <eventTypeData></eventTypeData>
+    </event>
+    <event id="modtagerindsatser" included="true" enabled="true" pending="false"
+        EffectivelyPending="false" EffectivelyIncluded="true" executed="false"
+        fullPath="modtagerindsatser" roles="" groups="" description="" label="Modtager indsatser"
+        eventType="" phases="" deadline="" sequence="4" parent="" type="" referId="">
+        <eventTypeData></eventTypeData>
+    </event>
+    <event id="pengeoverfoersel" included="true" enabled="true" pending="false"
+        EffectivelyPending="false" EffectivelyIncluded="true" executed="false"
+        fullPath="pengeoverfoersel" roles="" groups="" description="" label="Pengeoverf&#248;rsel"
+        eventType="" phases="" deadline="" sequence="1" parent="" type="" referId="">
+        <eventTypeData></eventTypeData>
+    </event>
+    <event id="terror" included="true" enabled="true" pending="false" EffectivelyPending="false"
+        EffectivelyIncluded="true" executed="false" fullPath="terror" roles="Bankr&#229;dgiver"
+        groups="" description="" label="Finansiering af terrorisme" eventType="" phases=""
+        deadline="" sequence="7" parent="" type="" referId="">
+        <eventTypeData></eventTypeData>
+    </event>
+    <event id="totalamount" included="true" enabled="true" pending="false"
+        EffectivelyPending="false" EffectivelyIncluded="true" executed="false"
+        fullPath="totalamount" roles="" groups="" description="" label="Totalamount" eventType=""
+        phases="" deadline="" sequence="15" parent="" type="" referId="">
+        <eventTypeData></eventTypeData>
+    </event>
+    <event id="tvivlomoplysninger" included="true" enabled="true" pending="false"
+        EffectivelyPending="false" EffectivelyIncluded="true" executed="false"
+        fullPath="tvivlomoplysninger" roles="Bankr&#229;dgiver" groups="" description=""
+        label="Tvivl om, hvorvidt tidligere indhentede oplysninge" eventType="" phases=""
+        deadline="" sequence="8" parent="" type="" referId="">
+        <eventTypeData></eventTypeData>
+    </event>
+    <event id="udbetalergevinster" included="true" enabled="true" pending="false"
+        EffectivelyPending="false" EffectivelyIncluded="true" executed="false"
+        fullPath="udbetalergevinster" roles="" groups="" description="" label="Udbetaler gevinster"
+        eventType="" phases="" deadline="" sequence="5" parent="" type="" referId="">
+        <eventTypeData></eventTypeData>
+    </event>
+    <event id="valutaveksling" included="true" enabled="true" pending="false"
+        EffectivelyPending="false" EffectivelyIncluded="true" executed="false"
+        fullPath="valutaveksling" roles="" groups="" description="" label="Valutaveksling"
+        eventType="" phases="" deadline="" sequence="2" parent="" type="" referId="">
+        <eventTypeData></eventTypeData>
+    </event>
+    <event id="veksling" included="true" enabled="true" pending="false" EffectivelyPending="false"
+        EffectivelyIncluded="true" executed="false" fullPath="veksling" roles="" groups=""
+        description="" label="Veksling" eventType="" phases="" deadline="" sequence="3" parent=""
+        type="" referId="">
+        <eventTypeData></eventTypeData>
+    </event>
+</events>

@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Albert\\Documents\\GitHub\\BachelorProject\\Bachelor.MQTT.Shared\\Bachelor.MQTT.Shared.csproj",
+      "projectUniqueName": "C:\\Users\\Albert\\OneDrive\\Documents\\GitHub\\BachelorProject\\Bachelor.MQTT.Shared\\Bachelor.MQTT.Shared.csproj",
       "projectName": "Bachelor.MQTT.Shared",
-      "projectPath": "C:\\Users\\Albert\\Documents\\GitHub\\BachelorProject\\Bachelor.MQTT.Shared\\Bachelor.MQTT.Shared.csproj",
+      "projectPath": "C:\\Users\\Albert\\OneDrive\\Documents\\GitHub\\BachelorProject\\Bachelor.MQTT.Shared\\Bachelor.MQTT.Shared.csproj",
       "packagesPath": "C:\\Users\\Albert\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Albert\\Documents\\GitHub\\BachelorProject\\Bachelor.MQTT.Shared\\obj\\",
+      "outputPath": "C:\\Users\\Albert\\OneDrive\\Documents\\GitHub\\BachelorProject\\Bachelor.MQTT.Shared\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Albert\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -64,7 +64,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.201/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.205/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

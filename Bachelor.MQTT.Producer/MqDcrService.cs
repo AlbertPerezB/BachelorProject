@@ -49,13 +49,14 @@ public class MqDcrService : IDisposable
     /// <summary>
     /// Subscribes to all the graph operations and sets the OnMessageReceived 
     /// </summary>
-    public async Task SetUpSubscribtions()
+    public async Task SetUpSubscriptions()
     {
         var builder = new SubscribeOptionsBuilder();
         builder.WithSubscription("DCR/StartSimulation/" + _client.Options.ClientId, HiveMQtt.MQTT5.Types.QualityOfService.AtMostOnceDelivery)
         .WithSubscription("DCR/GetEnabledEvents/" + _client.Options.ClientId, HiveMQtt.MQTT5.Types.QualityOfService.AtMostOnceDelivery)
         .WithSubscription("DCR/ExecuteEvent/" + _client.Options.ClientId, HiveMQtt.MQTT5.Types.QualityOfService.AtMostOnceDelivery)
-        .WithSubscription("DCR/Terminate/" + _client.Options.ClientId, HiveMQtt.MQTT5.Types.QualityOfService.AtMostOnceDelivery);
+        .WithSubscription("DCR/Terminate/" + _client.Options.ClientId, HiveMQtt.MQTT5.Types.QualityOfService.AtMostOnceDelivery)
+        .WithSubscription("DCR/GetLog/" + _client.Options.ClientId, HiveMQtt.MQTT5.Types.QualityOfService.AtMostOnceDelivery);
         var subscribeoptions = builder.Build();
 
         _client.OnMessageReceived += (s, e) =>
@@ -133,7 +134,7 @@ public class MqDcrService : IDisposable
     /// <param name="graphid"></param>
     /// <param name="simid"></param>
     /// <param name="eventid"></param>
-    public async Task ExecuteEvent(string graphid, string simid, string eventid)
+    public async Task ExecuteEvent(string graphid, string simid, string eventid, int value)
     {
         var msg = new MQTT5PublishMessage("DCR/ExecuteEvent", QualityOfService.ExactlyOnceDelivery); // Can change qos later
         SetCredentials(msg);
@@ -150,7 +151,7 @@ public class MqDcrService : IDisposable
         _responses.TryAdd(key, tcs);
         msg.CorrelationData = key.ToByteArray();
         msg.ResponseTopic = "DCR/ExecuteEvent/" + _client.Options.ClientId;
-        var request = new ExecuteEventRequest { Graphid = graphid, Simid = simid, EventID = eventid };
+        var request = new ExecuteEventRequest { Graphid = graphid, Simid = simid, EventID = eventid, Value = value };
         msg.PayloadAsString = JsonSerializer.Serialize(request);
         await _client.PublishAsync(msg).ConfigureAwait(false);
         await tcs.Task;
@@ -183,7 +184,30 @@ public class MqDcrService : IDisposable
         await _client.PublishAsync(msg).ConfigureAwait(false);
         await tcs.Task;
     }
-    
+
+    public async Task<LogEntry[]> GetLog(string graphid, string simid)
+    {
+        var msg = new MQTT5PublishMessage("DCR/GetLog", QualityOfService.ExactlyOnceDelivery); // Can change qos later
+        SetCredentials(msg);
+        var key = Guid.NewGuid();
+        var tcs = new TaskCompletionSource<string>();
+        var c = new CancellationTokenSource(TimeSpan.FromSeconds(30)); // Time out after 30 seconds
+        c.Token.Register(() =>
+        {
+            if (_responses.TryRemove(key, out var _))
+            {
+                tcs.TrySetCanceled();
+            }
+        }, false);
+        _responses.TryAdd(key, tcs);
+        msg.CorrelationData = key.ToByteArray();
+        msg.ResponseTopic = "DCR/GetLog/" + _client.Options.ClientId;
+        var request = new GetLogRequest { Graphid = graphid, Simid = simid };
+        msg.PayloadAsString = JsonSerializer.Serialize(request);
+        await _client.PublishAsync(msg).ConfigureAwait(false);
+        var result = await tcs.Task.ConfigureAwait(false);
+        return JsonSerializer.Deserialize<LogEntry[]>(result)!;
+    }
     public void Dispose()
     {
         Dispose(disposing: true);

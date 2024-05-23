@@ -3,6 +3,7 @@ using System.Xml.Serialization;
 using System.Net.Http.Json;
 using System.Text;
 using System.Net.Http.Headers;
+using Bachelor.MQTT.Shared;
 
 namespace Bachelor.MQTT.Subscriber;
 
@@ -42,7 +43,7 @@ public class DCRservice
     /// <returns>An instance of the Events class, which contains a list of events.</returns>
     public async Task<Events> GetEnabledEvent(string graphid, string simid, string username, string password)
     {
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/api/graphs/{graphid}/sims/{simid}/events?filter=only-enabled");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/api/graphs/{graphid}/sims/{simid}/events?filter=enabled-or-pending");
         request.Headers.Authorization = SetCredentials(username, password);
         var response = await _httpClient.SendAsync(request);
         response.EnsureSuccessStatusCode();
@@ -61,13 +62,25 @@ public class DCRservice
     /// <param name="eventid"></param>
     /// <param name="username"></param>
     /// <param name="password"></param>
-    public async Task ExecuteEvent(string graphid, string simid, string eventid, string username, string password)
+    public async Task ExecuteEvent(string graphid, string simid, string eventid, string username, string password, int value)
     {
+        string xml = $"<globalStore><variable id=\"{eventid}\" type=\"integer\" value=\"{value}\" isNull=\"false\"/> </globalStore>";
+        DCRvariable json = new DCRvariable{ DataXML = xml, Role = "role" };
         var request = new HttpRequestMessage(HttpMethod.Post, $"/api/graphs/{graphid}/sims/{simid}/events/{eventid}");
+        request.Content = JsonContent.Create(json); //new StringContent(string.Empty); 
+        request.Headers.Authorization = SetCredentials(username, password);
+        var response = await _httpClient.SendAsync(request);
+        response.EnsureSuccessStatusCode();
+    }
+
+    public async Task<LogEntry[]> GetLog(string graphid, string simid, string username, string password) {
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/api/graphs/{graphid}/sims/{simid}/log");
         request.Content = new StringContent(string.Empty);
         request.Headers.Authorization = SetCredentials(username, password);
         var response = await _httpClient.SendAsync(request);
         response.EnsureSuccessStatusCode();
+        var content = await response.Content.ReadFromJsonAsync<LogEntry[]>();
+        return content!;
     }
 
     /// <summary>
