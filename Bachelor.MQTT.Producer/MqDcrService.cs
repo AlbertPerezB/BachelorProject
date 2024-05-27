@@ -45,7 +45,7 @@ public class MqDcrService : IDisposable
     /// Returns the client id 
     /// </summary>
     public string ClientID() => _client.Options.ClientId!;
-    
+
     /// <summary>
     /// Subscribes to all the graph operations and sets the OnMessageReceived 
     /// </summary>
@@ -55,6 +55,7 @@ public class MqDcrService : IDisposable
         builder.WithSubscription("DCR/StartSimulation/" + _client.Options.ClientId, HiveMQtt.MQTT5.Types.QualityOfService.AtMostOnceDelivery)
         .WithSubscription("DCR/GetEnabledEvents/" + _client.Options.ClientId, HiveMQtt.MQTT5.Types.QualityOfService.AtMostOnceDelivery)
         .WithSubscription("DCR/ExecuteEvent/" + _client.Options.ClientId, HiveMQtt.MQTT5.Types.QualityOfService.AtMostOnceDelivery)
+        .WithSubscription("DCR/ExecuteValueEvent/" + _client.Options.ClientId, HiveMQtt.MQTT5.Types.QualityOfService.AtMostOnceDelivery)
         .WithSubscription("DCR/Terminate/" + _client.Options.ClientId, HiveMQtt.MQTT5.Types.QualityOfService.AtMostOnceDelivery)
         .WithSubscription("DCR/GetLog/" + _client.Options.ClientId, HiveMQtt.MQTT5.Types.QualityOfService.AtMostOnceDelivery);
         var subscribeoptions = builder.Build();
@@ -158,6 +159,36 @@ public class MqDcrService : IDisposable
     }
     
     /// <summary>
+    /// Executes an event, thus updating graph and enabled events  
+    /// </summary>
+    /// <param name="graphid"></param>
+    /// <param name="simid"></param>
+    /// <param name="eventid"></param>
+    public async Task<Dictionary<string, string>> ExecuteValueEvent(string graphid, string simid, string eventid, int value)
+    {
+        var msg = new MQTT5PublishMessage("DCR/ExecuteValueEvent", QualityOfService.ExactlyOnceDelivery); // Can change qos later
+        SetCredentials(msg);
+        var key = Guid.NewGuid();
+        var tcs = new TaskCompletionSource<string>();
+        var c = new CancellationTokenSource(TimeSpan.FromSeconds(30)); // Time out after 30 seconds
+        c.Token.Register(() =>
+        {
+            if (_responses.TryRemove(key, out var _))
+            {
+                tcs.TrySetCanceled();
+            }
+        }, false);
+        _responses.TryAdd(key, tcs);
+        msg.CorrelationData = key.ToByteArray();
+        msg.ResponseTopic = "DCR/ExecuteValueEvent/" + _client.Options.ClientId;
+        var request = new ExecuteEventRequest { Graphid = graphid, Simid = simid, EventID = eventid, Value = value };
+        msg.PayloadAsString = JsonSerializer.Serialize(request);
+        await _client.PublishAsync(msg).ConfigureAwait(false);
+        var result = await tcs.Task;
+        return JsonSerializer.Deserialize<Dictionary<string, string>>(result)!;
+    }
+
+    /// <summary>
     /// Deletes an instance of a graph simulation.
     /// </summary>
     /// <param name="graphid"></param>
@@ -241,7 +272,7 @@ public class MqDcrService : IDisposable
             _disposed = true;
         }
     }
-    
+
     /// <summary>
     /// Sets UserProperties for a given message
     /// </summary>

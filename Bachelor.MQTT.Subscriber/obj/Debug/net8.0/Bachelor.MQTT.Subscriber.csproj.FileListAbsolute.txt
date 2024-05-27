@@ -161,3 +161,4 @@ c:\Users\Albert\OneDrive\Documents\GitHub\BachelorProject\Bachelor.MQTT.Subscrib
 c:\Users\Albert\OneDrive\Documents\GitHub\BachelorProject\Bachelor.MQTT.Subscriber\obj\Debug\net8.0\Bachelor.MQTT.Subscriber.pdb
 c:\Users\Albert\OneDrive\Documents\GitHub\BachelorProject\Bachelor.MQTT.Subscriber\obj\Debug\net8.0\Bachelor.MQTT.Subscriber.genruntimeconfig.cache
 c:\Users\Albert\OneDrive\Documents\GitHub\BachelorProject\Bachelor.MQTT.Subscriber\obj\Debug\net8.0\ref\Bachelor.MQTT.Subscriber.dll
+c:\Users\Albert\OneDrive\Documents\GitHub\BachelorProject\Bachelor.MQTT.Subscriber\obj\Debug\net8.0\Bachelor.MQTT.Subscriber.sourcelink.json

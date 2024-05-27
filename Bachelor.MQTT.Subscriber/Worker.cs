@@ -93,6 +93,9 @@ public class Worker : BackgroundService
                 case var p when p == "DCR/ExecuteEvent":
                     await ExecuteEvent(e, client);
                     break;
+                case var p when p == "DCR/ExecuteValueEvent":
+                    await ExecuteValueEvent(e, client);
+                    break;
                 case var p when p == "DCR/Terminate":
                     await Terminate(e, client);
                     break;
@@ -105,6 +108,7 @@ public class Worker : BackgroundService
         builder.WithSubscription("$share/dcrgroup/DCR/StartSimulation", QualityOfService.AtLeastOnceDelivery)
         .WithSubscription("$share/dcrgroup/DCR/GetEnabledEvents", QualityOfService.AtLeastOnceDelivery)
         .WithSubscription("$share/dcrgroup/DCR/ExecuteEvent", QualityOfService.AtLeastOnceDelivery)
+        .WithSubscription("$share/dcrgroup/DCR/ExecuteValueEvent", QualityOfService.AtLeastOnceDelivery)
         .WithSubscription("$share/dcrgroup/DCR/Terminate", QualityOfService.AtLeastOnceDelivery)
         .WithSubscription("$share/dcrgroup/DCR/GetLog", QualityOfService.AtLeastOnceDelivery);
 
@@ -168,14 +172,31 @@ public class Worker : BackgroundService
     /// <param name="e"></param>
     /// <param name="client"></param>
     /// <returns></returns>
-    private async Task ExecuteEvent(OnMessageReceivedEventArgs e, HiveMQClient client)
-    {
+    private async Task ExecuteEvent(OnMessageReceivedEventArgs e, HiveMQClient client) {
         var request = JsonSerializer.Deserialize<ExecuteEventRequest>(e.PublishMessage.PayloadAsString);
-        await _dcrservice.ExecuteEvent(request!.Graphid, request.Simid, request.EventID, GetUsername(e.PublishMessage), GetPassword(e.PublishMessage), request.Value);
-
+        await _dcrservice.ExecuteEvent(request!.Graphid, request.Simid, request.EventID, GetUsername(e.PublishMessage), GetPassword(e.PublishMessage));
+    
         var msg = new MQTT5PublishMessage(e.PublishMessage.ResponseTopic!, QualityOfService.ExactlyOnceDelivery);
         msg.CorrelationData = e.PublishMessage.CorrelationData;
         msg.PayloadAsString = string.Empty;
+        await client.PublishAsync(msg);  
+    }
+
+    /// <summary>
+    /// Calls the ExecuteValueEvent from dcrservice and publishes the response message (string.Empty)
+    /// </summary>
+    /// <param name="e"></param>
+    /// <param name="client"></param>
+    /// <returns></returns>
+    private async Task ExecuteValueEvent(OnMessageReceivedEventArgs e, HiveMQClient client)
+    {
+        var request = JsonSerializer.Deserialize<ExecuteValueEventRequest>(e.PublishMessage.PayloadAsString);
+        var executeDict = await _dcrservice.ExecuteValueEvent(request!.Graphid, request.Simid, request.EventID, 
+            GetUsername(e.PublishMessage), GetPassword(e.PublishMessage), request.Value);
+
+        var msg = new MQTT5PublishMessage(e.PublishMessage.ResponseTopic!, QualityOfService.ExactlyOnceDelivery);
+        msg.CorrelationData = e.PublishMessage.CorrelationData;
+        msg.PayloadAsString = JsonSerializer.Serialize(executeDict);
         await client.PublishAsync(msg);
     }
 

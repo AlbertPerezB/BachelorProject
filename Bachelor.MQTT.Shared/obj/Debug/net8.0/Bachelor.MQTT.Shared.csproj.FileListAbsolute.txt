@@ -32,3 +32,4 @@ c:\Users\Albert\OneDrive\Documents\GitHub\BachelorProject\Bachelor.MQTT.Shared\o
 c:\Users\Albert\OneDrive\Documents\GitHub\BachelorProject\Bachelor.MQTT.Shared\obj\Debug\net8.0\refint\Bachelor.MQTT.Shared.dll
 c:\Users\Albert\OneDrive\Documents\GitHub\BachelorProject\Bachelor.MQTT.Shared\obj\Debug\net8.0\Bachelor.MQTT.Shared.pdb
 c:\Users\Albert\OneDrive\Documents\GitHub\BachelorProject\Bachelor.MQTT.Shared\obj\Debug\net8.0\ref\Bachelor.MQTT.Shared.dll
+c:\Users\Albert\OneDrive\Documents\GitHub\BachelorProject\Bachelor.MQTT.Shared\obj\Debug\net8.0\Bachelor.MQTT.Shared.sourcelink.json

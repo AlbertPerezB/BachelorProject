@@ -4,6 +4,7 @@ using System.Net.Http.Json;
 using System.Text;
 using System.Net.Http.Headers;
 using Bachelor.MQTT.Shared;
+using System.Xml.Linq;
 
 namespace Bachelor.MQTT.Subscriber;
 
@@ -62,15 +63,35 @@ public class DCRservice
     /// <param name="eventid"></param>
     /// <param name="username"></param>
     /// <param name="password"></param>
-    public async Task ExecuteEvent(string graphid, string simid, string eventid, string username, string password, int value)
+    public async Task ExecuteEvent(string graphid, string simid, string eventid, string username, string password)
+    {
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/api/graphs/{graphid}/sims/{simid}/events/{eventid}");
+        request.Content = new StringContent(string.Empty);
+        request.Headers.Authorization = SetCredentials(username, password);
+        var response = await _httpClient.SendAsync(request);
+        response.EnsureSuccessStatusCode();
+    }
+    
+    /// <summary>
+    /// Executes an event, thus updating graph and enabled events  
+    /// </summary>
+    /// <param name="graphid"></param>
+    /// <param name="simid"></param>
+    /// <param name="eventid"></param>
+    /// <param name="username"></param>
+    /// <param name="password"></param>
+    public async Task<Dictionary<string,string>> ExecuteValueEvent(string graphid, string simid, string eventid, string username, string password, int value)
     {
         string xml = $"<globalStore><variable id=\"{eventid}\" type=\"integer\" value=\"{value}\" isNull=\"false\"/> </globalStore>";
         DCRvariable json = new DCRvariable{ DataXML = xml, Role = "role" };
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/api/graphs/{graphid}/sims/{simid}/events/{eventid}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/api/graphs/{graphid}/sims/{simid}/events/{eventid}?filter=sendresponse");
         request.Content = JsonContent.Create(json); //new StringContent(string.Empty); 
         request.Headers.Authorization = SetCredentials(username, password);
         var response = await _httpClient.SendAsync(request);
         response.EnsureSuccessStatusCode();
+        var responsestring = await response.Content.ReadAsStringAsync();
+        var globalStoreDict = GetGlobalStore(responsestring);
+        return globalStoreDict;
     }
 
     public async Task<LogEntry[]> GetLog(string graphid, string simid, string username, string password) {
@@ -81,6 +102,16 @@ public class DCRservice
         response.EnsureSuccessStatusCode();
         var content = await response.Content.ReadFromJsonAsync<LogEntry[]>();
         return content!;
+    }
+
+    public Dictionary<string, string> GetGlobalStore(string content) {
+        var parsed = XElement.Parse(content);
+        var globalStore = parsed.Descendants("globalStore").FirstOrDefault();
+        if (globalStore == null) {return new Dictionary<string, string>();}
+        
+        var variables = globalStore.Descendants("variable");
+        return variables.Select(p => new {Key = p.Attribute("id")!.Value, Value = p.Attribute("value")!.Value})
+            .ToDictionary(p => p.Key, p => p.Value);
     }
 
     /// <summary>

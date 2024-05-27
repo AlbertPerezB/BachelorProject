@@ -104,3 +104,4 @@ c:\Users\Albert\OneDrive\Documents\GitHub\BachelorProject\Bachelor.MQTT.Producer
 c:\Users\Albert\OneDrive\Documents\GitHub\BachelorProject\Bachelor.MQTT.Producer\obj\Debug\net8.0\Bachelor.MQTT.Producer.pdb
 c:\Users\Albert\OneDrive\Documents\GitHub\BachelorProject\Bachelor.MQTT.Producer\obj\Debug\net8.0\Bachelor.MQTT.Producer.genruntimeconfig.cache
 c:\Users\Albert\OneDrive\Documents\GitHub\BachelorProject\Bachelor.MQTT.Producer\obj\Debug\net8.0\ref\Bachelor.MQTT.Producer.dll
+c:\Users\Albert\OneDrive\Documents\GitHub\BachelorProject\Bachelor.MQTT.Producer\obj\Debug\net8.0\Bachelor.MQTT.Producer.sourcelink.json

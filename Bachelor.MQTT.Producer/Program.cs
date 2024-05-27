@@ -14,8 +14,6 @@ namespace Bachelor.MQTT.Producer
 {
     internal class Program
     {
-        private static string _graphid = string.Empty;
-
         public static async Task Main(string[] args)
         {
             // Loads and configures
@@ -25,7 +23,9 @@ namespace Bachelor.MQTT.Producer
             var dcrconfig = new DCRconfig();
             config.GetSection("DCR").Bind(dcrconfig);
 
-            _graphid = AnsiConsole.Ask<string>("Graphid please: ");
+            dcrconfig.DetectorID = AnsiConsole.Prompt(new TextPrompt<string>("Detector graph-id please: ")
+                .DefaultValue("1822861").PromptStyle("cyan").ShowDefaultValue());
+            dcrconfig.CustomerID = AnsiConsole.Ask<string>("Customer behaviour graph-id please: ");
             var tasklist = new List<Task>();
 
             using var client = new MqDcrService(hivemqconfig.Username, hivemqconfig.Password, hivemqconfig.Server,
@@ -33,48 +33,50 @@ namespace Bachelor.MQTT.Producer
             await client.ConnectAsync();
             await client.SetUpSubscriptions();
 
-            var startsimresponse = await client.StartSimulation(_graphid);
-            var dontTerminate = true;
-            while (dontTerminate)
-            {
-                var enabledeventsresponse = await client.GetEnabledEvents(_graphid, startsimresponse.Simid);
-                var dcrevent = SelectEvent(enabledeventsresponse.DCRevents.Where(p => p.Enabled).ToArray());
-                var value = AnsiConsole.Ask<int>("Value please: ");
-                await client.ExecuteEvent(_graphid, startsimresponse.Simid, dcrevent.EventID, value);
-                await RunLazyUser(client, startsimresponse.Simid);
-                var log = await client.GetLog(_graphid, startsimresponse.Simid);
-                if (log.Any(p => p.EventId == "KYC_ACTIVITY")) dontTerminate = false;
-            }
-            await client.Terminate(_graphid, startsimresponse.Simid);
-
-            // for (var j = 0; j < 1; j++)
+            // var startsimresponse = await client.StartSimulation(dcrconfig.DetectorID);
+            // var dontTerminate = true;
+            // while (dontTerminate)
             // {
-            //     var t = Task.Run(async () =>
-            //     {
-            //         using var client = new MqDcrService(hivemqconfig.Username, hivemqconfig.Password, hivemqconfig.Server,
-            //                 hivemqconfig.Port, dcrconfig.Username, dcrconfig.Password);
-            //         await client.ConnectAsync();
-            //         await client.SetUpSubscriptions();
-
-            //         var startsimresponse = await client.StartSimulation(_graphid);
-            //         for (var i = 0; i < 1; i++)
-            //         {
-            //             var enabledeventsresponse = await client.GetEnabledEvents(_graphid, startsimresponse.Simid);
-            //             // var dcrevent = RandomEvent.GetRandomEvent(enabledeventsresponse.DCRevents);
-            //             var dcrevent = enabledeventsresponse.DCRevents.First(p => p.EventID=="pengeoverfoersel");
-            //             AnsiConsole.WriteLine($"Event: {dcrevent.Label} & ClientID: {client.ClientID()}");
-            //             await client.ExecuteEvent(_graphid, startsimresponse.Simid, dcrevent.EventID, 30000);
-            //             enabledeventsresponse = await client.GetEnabledEvents(_graphid, startsimresponse.Simid);
-            //             foreach (var item in enabledeventsresponse.DCRevents.Where(p => p.Pending && p.Enabled)) {
-            //                await client.ExecuteEvent(_graphid, startsimresponse.Simid, item.EventID, 30000);
-            //             }
-            //         }
+            //     var enabledeventsresponse = await client.GetEnabledEvents(_graphid, startsimresponse.Simid);
+            //     var dcrevent = SelectEvent(enabledeventsresponse.DCRevents.Where(p => p.Enabled).ToArray());
+            //     var value = AnsiConsole.Ask<int>("Value please: ");
+            //     var executedict = await client.ExecuteEvent(_graphid, startsimresponse.Simid, dcrevent.EventID, value);
+            //     await RunLazyUser(client, startsimresponse.Simid);
             //     var log = await client.GetLog(_graphid, startsimresponse.Simid);
-            //     await client.Terminate(_graphid,startsimresponse.Simid);
-            //     });
-            //     tasklist.Add(t);
+            //     if (log.Any(p => p.EventId == "KYC_ACTIVITY")) dontTerminate = false;
             // }
-            // await Task.WhenAll(tasklist.ToArray()).ConfigureAwait(false);
+            // await client.Terminate(_graphid, startsimresponse.Simid);
+
+            for (var j = 0; j < 1; j++)
+            {
+                var t = Task.Run(async () =>
+                {
+                    using var client = new MqDcrService(hivemqconfig.Username, hivemqconfig.Password, hivemqconfig.Server,
+                            hivemqconfig.Port, dcrconfig.Username, dcrconfig.Password);
+                    await client.ConnectAsync();
+                    await client.SetUpSubscriptions();
+
+                    var startdetectorresponse = await client.StartSimulation(dcrconfig.DetectorID);
+                    var startcustomerresponse = await client.StartSimulation(dcrconfig.CustomerID);
+                    for (var i = 0; i < 1; i++)
+                    {
+                        var enabledcustomerresponse = await client.GetEnabledEvents(dcrconfig.CustomerID, startcustomerresponse.Simid);
+                        var dcrevent = RandomEvent.GetRandomEvent(enabledcustomerresponse.DCRevents);
+                        // var dcrevent = enabledeventsresponse.DCRevents.First(p => p.EventID == "pengeoverfoersel");
+                        AnsiConsole.WriteLine($"Event: {dcrevent.Label} & ClientID: {client.ClientID()}");
+                        await client.ExecuteEvent(dcrconfig.CustomerID, startcustomerresponse.Simid, dcrevent.EventID, 30000);
+                        enabledeventsresponse = await client.GetEnabledEvents(_graphid, startsimresponse.Simid);
+                        foreach (var item in enabledeventsresponse.DCRevents.Where(p => p.Pending && p.Enabled))
+                        {
+                            await client.ExecuteEvent(_graphid, startsimresponse.Simid, item.EventID, 30000);
+                        }
+                    }
+                    var log = await client.GetLog(_graphid, startsimresponse.Simid);
+                    await client.Terminate(_graphid, startsimresponse.Simid);
+                });
+                tasklist.Add(t);
+            }
+            await Task.WhenAll(tasklist.ToArray()).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -106,7 +108,6 @@ namespace Bachelor.MQTT.Producer
                 }
             }
         }
-
 
         private static DCRevent SelectEvent(DCRevent[] events)
         {
