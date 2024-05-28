@@ -1,35 +1,144 @@
-<event id="pengeoverfoersel">
-    <custom>
-      <visualization>
-        <location xLoc="130" yLoc="60" />
-        <colors bg="#f9f7ed" textStroke="#000000" stroke="#cccccc" />
-      </visualization>
-      <roles>
-        <role />
-      </roles>
-      <readRoles>
-        <readRole />
-      </readRoles>
-      <groups>
-        <group />
-      </groups>
-      <phases>
-        <phase />
-      </phases>
-      <eventType></eventType>
-      <eventScope>private</eventScope>
-      <eventTypeData></eventTypeData>
-      <eventDescription></eventDescription>
-      <purpose></purpose>
-      <guide></guide>
-      <insight use="false"></insight>
-      <level>1</level>
-      <sequence>1</sequence>
-      <costs>0</costs>
-      <eventData>
-        <dataType sequence="1" width="small" min="NaN" max="NaN" placeholder="" hinttext="Skriv beløb">int</dataType>
-        <validationRules></validationRules>
-      </eventData>
-      <interfaces></interfaces>
-    </custom>
-  </event>
+<executionResult>
+  <dcrgraph title="BSc Albert Sus" dataTypesStatus="hide" filterLevel="-1" insightFilter="false"
+    zoomLevel="0" formGroupStyle="Normal" formLayoutStyle="Horizontal" formShowPendingCount="true"
+    graphBG="#f1f6fe" graphType="0" exercise="false" version="1.0">
+    <specification>
+      <resources>
+        <events>
+          <event id="Activity0">
+            <custom>
+              <visualization>
+                <location xLoc="403" yLoc="107" />
+                <colors bg="#f9f7ed" textStroke="#000000" stroke="#cccccc" />
+              </visualization>
+              <roles>
+                <role />
+              </roles>
+              <readRoles>
+                <readRole />
+              </readRoles>
+              <groups>
+                <group />
+              </groups>
+              <phases>
+                <phase />
+              </phases>
+              <eventType></eventType>
+              <eventScope>private</eventScope>
+              <eventTypeData></eventTypeData>
+              <eventDescription></eventDescription>
+              <purpose></purpose>
+              <guide></guide>
+              <insight use="false"></insight>
+              <level>1</level>
+              <sequence>1</sequence>
+              <costs>0</costs>
+              <eventData>
+                <dataType sequence="1" width="small" min="NaN" max="NaN" placeholder="" hinttext="">
+                  int</dataType>
+                <validationRules></validationRules>
+              </eventData>
+              <interfaces></interfaces>
+            </custom>
+          </event>
+        </events>
+        <subProcesses />
+        <distribution />
+        <labels>
+          <label id="Transaktion" />
+        </labels>
+        <labelMappings>
+          <labelMapping eventId="Activity0" labelId="Transaktion" />
+        </labelMappings>
+        <expressions />
+        <variables></variables>
+        <variableAccesses />
+        <custom>
+          <keywords></keywords>
+          <roles></roles>
+          <groups></groups>
+          <phases></phases>
+          <eventTypes></eventTypes>
+          <eventParameters></eventParameters>
+          <graphDetails>DCR Process</graphDetails>
+          <graphDocumentation></graphDocumentation>
+          <graphLanguage>en-US</graphLanguage>
+          <graphDomain>process</graphDomain>
+          <graphFilters>
+            <filteredGroups></filteredGroups>
+            <filteredRoles></filteredRoles>
+            <filteredPhases></filteredPhases>
+          </graphFilters>
+          <hightlighterMarkup id="HLM"></hightlighterMarkup>
+          <highlighterMarkup>
+            <highlightLayers>
+              <highlightLayer default="true" name="description"><![CDATA[DCR Process]]></highlightLayer>
+            </highlightLayers>
+            <highlights></highlights>
+          </highlighterMarkup>
+        </custom>
+      </resources>
+      <constraints>
+        <conditions />
+        <responses />
+        <coresponses />
+        <includes />
+        <excludes />
+        <milestones />
+        <spawns />
+        <templateSpawns />
+        <updates />
+      </constraints>
+    </specification>
+    <runtime accepting="true">
+      <custom>
+        <globalMarking>
+          <enabled>
+            <event fullLabel="Transaktion" fullPath="Activity0"
+              time="2024-05-27T12:08:51.2297270+00:00" />
+          </enabled>
+          <enabledSubprocesses />
+          <executed>
+            <event fullLabel="Transaktion" fullPath="Activity0"
+              time="2024-05-27T12:08:51.2297270+00:00" />
+          </executed>
+          <pending />
+          <included>
+            <event fullLabel="Transaktion" fullPath="Activity0"
+              time="2024-05-27T12:08:51.2297270+00:00" />
+          </included>
+        </globalMarking>
+        <time current="2024-05-27T12:08:51.2297270+00:00" deadline="" delay="" />
+      </custom>
+      <marking>
+        <globalStore>
+          <variable id="Activity0" value="20000" isNull="false" type="int" />
+        </globalStore>
+        <executed>
+          <event id="Activity0" time="2024-05-27T12:08:51.2297270+00:00" />
+        </executed>
+        <included>
+          <event id="Activity0" />
+        </included>
+        <pendingResponses />
+      </marking>
+      <log>
+        <trace init="2024-05-27T12:08:51.2297270+00:00">
+          <event id="Activity0" timestamp="2024-05-27T12:08:51.2297270+00:00" label="Transaktion" />
+        </trace>
+      </log>
+    </runtime>
+  </dcrgraph>
+  <delta processId="-1">
+    <enable>
+      <event id="Activity0" />
+    </enable>
+    <disable />
+    <addExecuted />
+    <removeExecuted />
+    <addPending />
+    <removePending />
+    <addIncluded />
+    <removeIncluded />
+  </delta>
+</executionResult>

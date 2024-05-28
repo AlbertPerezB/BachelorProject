@@ -135,7 +135,7 @@ public class MqDcrService : IDisposable
     /// <param name="graphid"></param>
     /// <param name="simid"></param>
     /// <param name="eventid"></param>
-    public async Task ExecuteEvent(string graphid, string simid, string eventid, int value)
+    public async Task ExecuteEvent(string graphid, string simid, string eventid)
     {
         var msg = new MQTT5PublishMessage("DCR/ExecuteEvent", QualityOfService.ExactlyOnceDelivery); // Can change qos later
         SetCredentials(msg);
@@ -152,7 +152,7 @@ public class MqDcrService : IDisposable
         _responses.TryAdd(key, tcs);
         msg.CorrelationData = key.ToByteArray();
         msg.ResponseTopic = "DCR/ExecuteEvent/" + _client.Options.ClientId;
-        var request = new ExecuteEventRequest { Graphid = graphid, Simid = simid, EventID = eventid, Value = value };
+        var request = new ExecuteEventRequest { Graphid = graphid, Simid = simid, EventID = eventid };
         msg.PayloadAsString = JsonSerializer.Serialize(request);
         await _client.PublishAsync(msg).ConfigureAwait(false);
         await tcs.Task;
@@ -164,7 +164,7 @@ public class MqDcrService : IDisposable
     /// <param name="graphid"></param>
     /// <param name="simid"></param>
     /// <param name="eventid"></param>
-    public async Task<Dictionary<string, string>> ExecuteValueEvent(string graphid, string simid, string eventid, int value)
+    public async Task<Dictionary<string, string>> ExecuteValueEvent(string graphid, string simid, string eventid, string value)
     {
         var msg = new MQTT5PublishMessage("DCR/ExecuteValueEvent", QualityOfService.ExactlyOnceDelivery); // Can change qos later
         SetCredentials(msg);
@@ -181,7 +181,7 @@ public class MqDcrService : IDisposable
         _responses.TryAdd(key, tcs);
         msg.CorrelationData = key.ToByteArray();
         msg.ResponseTopic = "DCR/ExecuteValueEvent/" + _client.Options.ClientId;
-        var request = new ExecuteEventRequest { Graphid = graphid, Simid = simid, EventID = eventid, Value = value };
+        var request = new ExecuteValueEventRequest { Graphid = graphid, Simid = simid, EventID = eventid, Value = value };
         msg.PayloadAsString = JsonSerializer.Serialize(request);
         await _client.PublishAsync(msg).ConfigureAwait(false);
         var result = await tcs.Task;

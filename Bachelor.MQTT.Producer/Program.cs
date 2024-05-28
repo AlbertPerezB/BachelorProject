@@ -1,4 +1,5 @@
-﻿using System.Dynamic;
+﻿using System.Diagnostics;
+using System.Dynamic;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using Bachelor.MQTT.Shared;
@@ -23,29 +24,35 @@ namespace Bachelor.MQTT.Producer
             var dcrconfig = new DCRconfig();
             config.GetSection("DCR").Bind(dcrconfig);
 
-            dcrconfig.DetectorID = AnsiConsole.Prompt(new TextPrompt<string>("Detector graph-id please: ")
-                .DefaultValue("1822861").PromptStyle("cyan").ShowDefaultValue());
-            dcrconfig.CustomerID = AnsiConsole.Ask<string>("Customer behaviour graph-id please: ");
+            AnsiConsole.Write(
+                new FigletText("DCR with HiveMQ simulator")
+                    .LeftJustified()
+                    .Color(Color.Blue));
+
+            var detectorgraphid = AnsiConsole.Prompt(new TextPrompt<string>("Detector graph-id please [cyan](default: BSc Albert Detector)[/]: ")
+                .DefaultValue("1822861").PromptStyle("cyan").HideDefaultValue());
+
+            var options = new[]
+            {
+                new SpectreSelectionOption("BSc Albert Sus Customer", "1822880"),
+                new SpectreSelectionOption("BSc Albert Good Customer", "1822881"),
+                new SpectreSelectionOption("Write your own...", "")
+            };
+
+            var customergraphid = Convert.ToString(AnsiConsole.Prompt(
+                new SelectionPrompt<SpectreSelectionOption>().Title("Choose a customer behaviour graph or enter your own graph-id:")
+                    .AddChoices(options)).Value)!;
+
+            if (customergraphid == "") customergraphid = AnsiConsole.Prompt(new TextPrompt<string>("Enter graph-id: "));
+
+            AnsiConsole.Clear();
+
             var tasklist = new List<Task>();
 
             using var client = new MqDcrService(hivemqconfig.Username, hivemqconfig.Password, hivemqconfig.Server,
                             hivemqconfig.Port, dcrconfig.Username, dcrconfig.Password);
             await client.ConnectAsync();
             await client.SetUpSubscriptions();
-
-            // var startsimresponse = await client.StartSimulation(dcrconfig.DetectorID);
-            // var dontTerminate = true;
-            // while (dontTerminate)
-            // {
-            //     var enabledeventsresponse = await client.GetEnabledEvents(_graphid, startsimresponse.Simid);
-            //     var dcrevent = SelectEvent(enabledeventsresponse.DCRevents.Where(p => p.Enabled).ToArray());
-            //     var value = AnsiConsole.Ask<int>("Value please: ");
-            //     var executedict = await client.ExecuteEvent(_graphid, startsimresponse.Simid, dcrevent.EventID, value);
-            //     await RunLazyUser(client, startsimresponse.Simid);
-            //     var log = await client.GetLog(_graphid, startsimresponse.Simid);
-            //     if (log.Any(p => p.EventId == "KYC_ACTIVITY")) dontTerminate = false;
-            // }
-            // await client.Terminate(_graphid, startsimresponse.Simid);
 
             for (var j = 0; j < 1; j++)
             {
@@ -56,23 +63,34 @@ namespace Bachelor.MQTT.Producer
                     await client.ConnectAsync();
                     await client.SetUpSubscriptions();
 
-                    var startdetectorresponse = await client.StartSimulation(dcrconfig.DetectorID);
-                    var startcustomerresponse = await client.StartSimulation(dcrconfig.CustomerID);
-                    for (var i = 0; i < 1; i++)
+                    var startdetectorresponse = await client.StartSimulation(detectorgraphid);
+                    var startcustomerresponse = await client.StartSimulation(customergraphid);
+
+                    for (var i = 0; i < 5; i++)
                     {
-                        var enabledcustomerresponse = await client.GetEnabledEvents(dcrconfig.CustomerID, startcustomerresponse.Simid);
+                        var enabledcustomerresponse = await client.GetEnabledEvents(customergraphid, startcustomerresponse.Simid);
                         var dcrevent = RandomEvent.GetRandomEvent(enabledcustomerresponse.DCRevents);
                         // var dcrevent = enabledeventsresponse.DCRevents.First(p => p.EventID == "pengeoverfoersel");
-                        AnsiConsole.WriteLine($"Event: {dcrevent.Label} & ClientID: {client.ClientID()}");
-                        await client.ExecuteEvent(dcrconfig.CustomerID, startcustomerresponse.Simid, dcrevent.EventID, 30000);
-                        enabledeventsresponse = await client.GetEnabledEvents(_graphid, startsimresponse.Simid);
-                        foreach (var item in enabledeventsresponse.DCRevents.Where(p => p.Pending && p.Enabled))
+                        var valuedict = await client.ExecuteValueEvent(customergraphid, startcustomerresponse.Simid, dcrevent.EventID, "0");
+                        AnsiConsole.WriteLine($"Event: {dcrevent.Label} with value: {valuedict[dcrevent.EventID]} & ClientID: {client.ClientID()}");
+                        var enableddetectorresponse = await client.GetEnabledEvents(detectorgraphid, startdetectorresponse.Simid);
+                        var detectoreventid = dcrevent.EventID;
+                        dcrevent = enableddetectorresponse.DCRevents.First(p => p.Label == dcrevent.Label);
+                        await client.ExecuteValueEvent(detectorgraphid, startdetectorresponse.Simid, dcrevent.EventID, valuedict[detectoreventid]); // don't need to store result
+                        await RunLazyUser(client, detectorgraphid, startdetectorresponse.Simid);
+                        var log = await client.GetLog(detectorgraphid, startdetectorresponse.Simid);
+                        if (log.Any(p => p.EventId == "KYC_ACTIVITY"))
                         {
-                            await client.ExecuteEvent(_graphid, startsimresponse.Simid, item.EventID, 30000);
+                            // Thread.Sleep(2500);
+                            await client.Terminate(detectorgraphid, startdetectorresponse.Simid);
+                            await client.Terminate(customergraphid, startcustomerresponse.Simid);
+                            // AnsiConsole.Clear();
+                            ShowFlashingMessage("SUS DETECTED!", 8);
+                            Console.ReadLine();
+                            break;
                         }
+
                     }
-                    var log = await client.GetLog(_graphid, startsimresponse.Simid);
-                    await client.Terminate(_graphid, startsimresponse.Simid);
                 });
                 tasklist.Add(t);
             }
@@ -94,16 +112,29 @@ namespace Bachelor.MQTT.Producer
             return builder.Build();
         }
 
-        private static async Task RunLazyUser(MqDcrService client, string simid)
+
+        static void ShowFlashingMessage(string message, int durationInSeconds)
+        {
+            var figletText = new FigletText(message)
+                .Centered()
+                .Color(Color.Red);
+            // Render the message
+            AnsiConsole.Write(figletText);
+
+            // Wait for the specified duration
+            Thread.Sleep(durationInSeconds * 1000);
+        }
+        private static async Task RunLazyUser(MqDcrService client, string graphid, string simid)
         {
             var flag = true;
             while (flag)
             {
                 flag = false;
-                var enabledeventsresponse = await client.GetEnabledEvents(_graphid, simid);
+                var enabledeventsresponse = await client.GetEnabledEvents(graphid, simid);
                 foreach (var item in enabledeventsresponse.DCRevents.Where(p => p.Pending && p.Enabled))
                 {
-                    await client.ExecuteEvent(_graphid, simid, item.EventID, 0);
+                    await client.ExecuteEvent(graphid, simid, item.EventID);
+                    AnsiConsole.WriteLine($"Event: {item.Label} & ClientID: {client.ClientID()} (executed by Lazy User)");
                     flag = true;
                 }
             }
