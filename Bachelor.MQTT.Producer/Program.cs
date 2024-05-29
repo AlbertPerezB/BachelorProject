@@ -11,6 +11,7 @@ using HiveMQtt.MQTT5.Types;
 using Microsoft.Extensions.Configuration;
 using Spectre.Console;
 
+
 namespace Bachelor.MQTT.Producer
 {
     internal class Program
@@ -54,47 +55,90 @@ namespace Bachelor.MQTT.Producer
             await client.ConnectAsync();
             await client.SetUpSubscriptions();
 
-            for (var j = 0; j < 1; j++)
-            {
-                var t = Task.Run(async () =>
+            var table = new Table().Centered()
+                .AddColumn(new TableColumn("Client1"))
+                .AddColumn("Client2")
+                .AddColumn("Client3").Expand();
+
+            table.Title = new TableTitle("[blue]HiveMQ simulator[/] - [yellow4]Lazy User[/]", Style.Parse("bold"));
+
+            await AnsiConsole.Live(table)
+                .AutoClear(false)   // Do not remove when done
+                .Overflow(VerticalOverflow.Visible) // Show ellipsis when overflowing
+                .StartAsync(async ctx =>
                 {
-                    using var client = new MqDcrService(hivemqconfig.Username, hivemqconfig.Password, hivemqconfig.Server,
-                            hivemqconfig.Port, dcrconfig.Username, dcrconfig.Password);
-                    await client.ConnectAsync();
-                    await client.SetUpSubscriptions();
-
-                    var startdetectorresponse = await client.StartSimulation(detectorgraphid);
-                    var startcustomerresponse = await client.StartSimulation(customergraphid);
-
-                    for (var i = 0; i < 5; i++)
-                    {
-                        var enabledcustomerresponse = await client.GetEnabledEvents(customergraphid, startcustomerresponse.Simid);
-                        var dcrevent = RandomEvent.GetRandomEvent(enabledcustomerresponse.DCRevents);
-                        // var dcrevent = enabledeventsresponse.DCRevents.First(p => p.EventID == "pengeoverfoersel");
-                        var valuedict = await client.ExecuteValueEvent(customergraphid, startcustomerresponse.Simid, dcrevent.EventID, "0");
-                        AnsiConsole.WriteLine($"Event: {dcrevent.Label} with value: {valuedict[dcrevent.EventID]} & ClientID: {client.ClientID()}");
-                        var enableddetectorresponse = await client.GetEnabledEvents(detectorgraphid, startdetectorresponse.Simid);
-                        var detectoreventid = dcrevent.EventID;
-                        dcrevent = enableddetectorresponse.DCRevents.First(p => p.Label == dcrevent.Label);
-                        await client.ExecuteValueEvent(detectorgraphid, startdetectorresponse.Simid, dcrevent.EventID, valuedict[detectoreventid]); // don't need to store result
-                        await RunLazyUser(client, detectorgraphid, startdetectorresponse.Simid);
-                        var log = await client.GetLog(detectorgraphid, startdetectorresponse.Simid);
-                        if (log.Any(p => p.EventId == "KYC_ACTIVITY"))
-                        {
-                            // Thread.Sleep(2500);
-                            await client.Terminate(detectorgraphid, startdetectorresponse.Simid);
-                            await client.Terminate(customergraphid, startcustomerresponse.Simid);
-                            // AnsiConsole.Clear();
-                            ShowFlashingMessage("SUS DETECTED!", 8);
-                            Console.ReadLine();
-                            break;
-                        }
-
-                    }
+                    await RunClient(hivemqconfig, dcrconfig, detectorgraphid, customergraphid, tasklist, table, ctx).ConfigureAwait(false);
+                    ctx.Refresh();
+                    Console.ReadLine();
                 });
-                tasklist.Add(t);
+        }
+
+        private static async Task RunClient(HiveMQConfig hivemqconfig, DCRconfig dcrconfig, string detectorgraphid, string customergraphid, List<Task> tasklist, Table table, LiveDisplayContext ctx)
+        {
+            Task t1 = CreateClient(hivemqconfig, dcrconfig, detectorgraphid, customergraphid, table, ctx, 0);
+            Task t2 = CreateClient(hivemqconfig, dcrconfig, detectorgraphid, customergraphid, table, ctx, 1);
+            Task t3 = CreateClient(hivemqconfig, dcrconfig, detectorgraphid, customergraphid, table, ctx, 2);
+
+
+            await Task.WhenAll(t1, t2, t3).ConfigureAwait(false);
+            table.Caption("All producers done");
+        }
+
+        private static Task CreateClient(HiveMQConfig hivemqconfig, DCRconfig dcrconfig, string detectorgraphid, string customergraphid, Table table, LiveDisplayContext ctx, int number)
+        {
+            return Task.Run(async () =>
+            {
+                await ExecuteSimulation(hivemqconfig, dcrconfig, detectorgraphid, customergraphid, table, ctx, number);
+            });
+        }
+
+        private static async Task ExecuteSimulation(HiveMQConfig hivemqconfig, DCRconfig dcrconfig, string detectorgraphid, string customergraphid, Table table, LiveDisplayContext ctx, int j)
+        {
+            var susflag = false;
+            using var client = new MqDcrService(hivemqconfig.Username, hivemqconfig.Password, hivemqconfig.Server,
+                                        hivemqconfig.Port, dcrconfig.Username, dcrconfig.Password);
+            await client.ConnectAsync();
+            await client.SetUpSubscriptions();
+
+            var startdetectorresponse = await client.StartSimulation(detectorgraphid);
+            var startcustomerresponse = await client.StartSimulation(customergraphid);
+
+            for (var i = 0; i < 5; i++)
+            {
+                var enabledcustomerresponse = await client.GetEnabledEvents(customergraphid, startcustomerresponse.Simid);
+                var dcrevent = RandomEvent.GetRandomEvent(enabledcustomerresponse.DCRevents);
+                // var dcrevent = enabledeventsresponse.DCRevents.First(p => p.EventID == "pengeoverfoersel");
+                var valuedict = await client.ExecuteValueEvent(customergraphid, startcustomerresponse.Simid, dcrevent.EventID, "0");
+                // AnsiConsole.WriteLine($"Event: {dcrevent.Label} with value: {valuedict[dcrevent.EventID]} & ClientID: {client.ClientID()}");
+                var enableddetectorresponse = await client.GetEnabledEvents(detectorgraphid, startdetectorresponse.Simid);
+                var detectoreventid = dcrevent.EventID;
+                dcrevent = enableddetectorresponse.DCRevents.First(p => p.Label == dcrevent.Label);
+                AddRow(table, j, dcrevent.Label + ": " + valuedict[detectoreventid]);
+                ctx.Refresh();
+                await client.ExecuteValueEvent(detectorgraphid, startdetectorresponse.Simid, dcrevent.EventID, valuedict[detectoreventid]); // don't need to store result
+                await RunLazyUser(client, detectorgraphid, startdetectorresponse.Simid, table, j);
+                var log = await client.GetLog(detectorgraphid, startdetectorresponse.Simid);
+                if (log.Any(p => p.EventId == "KYC_ACTIVITY"))
+                {
+                    // Thread.Sleep(2500);
+                    await client.Terminate(detectorgraphid, startdetectorresponse.Simid);
+                    await client.Terminate(customergraphid, startcustomerresponse.Simid);
+                    susflag = true;
+
+                    // AnsiConsole.Clear();
+                    // ShowFlashingMessage("SUS DETECTED!", 8);
+                    // Console.ReadLine();
+                    break;
+                }
             }
-            await Task.WhenAll(tasklist.ToArray()).ConfigureAwait(false);
+            if (susflag) AddRow(table, j, "[red]SUS DETECTED!!![/]");
+            else AddRow(table, j, "[green]Finished with no sus![/]");
+        }
+        private static void AddRow(Table table, int j, string message)
+        {
+            table.AddRow(j == 0 ? message : string.Empty,
+                                j == 1 ? message : string.Empty,
+                                j == 2 ? message : string.Empty);
         }
 
         /// <summary>
@@ -111,20 +155,7 @@ namespace Bachelor.MQTT.Producer
             .AddEnvironmentVariables();
             return builder.Build();
         }
-
-
-        static void ShowFlashingMessage(string message, int durationInSeconds)
-        {
-            var figletText = new FigletText(message)
-                .Centered()
-                .Color(Color.Red);
-            // Render the message
-            AnsiConsole.Write(figletText);
-
-            // Wait for the specified duration
-            Thread.Sleep(durationInSeconds * 1000);
-        }
-        private static async Task RunLazyUser(MqDcrService client, string graphid, string simid)
+        private static async Task RunLazyUser(MqDcrService client, string graphid, string simid, Table table, int j)
         {
             var flag = true;
             while (flag)
@@ -134,21 +165,22 @@ namespace Bachelor.MQTT.Producer
                 foreach (var item in enabledeventsresponse.DCRevents.Where(p => p.Pending && p.Enabled))
                 {
                     await client.ExecuteEvent(graphid, simid, item.EventID);
-                    AnsiConsole.WriteLine($"Event: {item.Label} & ClientID: {client.ClientID()} (executed by Lazy User)");
+                    AddRow(table, j, $"[yellow4]{item.Label}[/]");
+                    // AnsiConsole.WriteLine($"Event: {item.Label} & ClientID: {client.ClientID()} (executed by Lazy User)");
                     flag = true;
                 }
             }
         }
 
-        private static DCRevent SelectEvent(DCRevent[] events)
-        {
-            return AnsiConsole.Prompt(
-            new SelectionPrompt<DCRevent>()
-                .Title("Select an event")
-                .PageSize(10)
-                .MoreChoicesText("[grey](Move up and down to reveal more events)[/]")
-                .UseConverter(p => p.Label)
-                .AddChoices(events));
-        }
+        // private static DCRevent SelectEvent(DCRevent[] events)
+        // {
+        //     return AnsiConsole.Prompt(
+        //     new SelectionPrompt<DCRevent>()
+        //         .Title("Select an event")
+        //         .PageSize(10)
+        //         .MoreChoicesText("[grey](Move up and down to reveal more events)[/]")
+        //         .UseConverter(p => p.Label)
+        //         .AddChoices(events));
+        // }
     }
 }

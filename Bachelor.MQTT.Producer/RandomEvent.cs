@@ -16,7 +16,7 @@ public static class RandomEvent
         {
             randomlist.AddRange(Enumerable.Repeat(item, GetWeight(item)));
         }
-        AnsiConsole.WriteLine(randomlist.Count);
+        // AnsiConsole.WriteLine(randomlist.Count);
         var i = new Random().Next(0, randomlist.Count);
         return randomlist[i];
     }
