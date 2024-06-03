@@ -36,7 +36,7 @@ namespace Bachelor.MQTT.Producer
             var options = new[]
             {
                 new SpectreSelectionOption("BSc Albert Sus Customer", "1822880"),
-                new SpectreSelectionOption("BSc Albert Good Customer", "1822881"),
+                new SpectreSelectionOption("BSc Albert Good Customer", "1823571"),
                 new SpectreSelectionOption("Write your own...", "")
             };
 
@@ -106,9 +106,7 @@ namespace Bachelor.MQTT.Producer
             {
                 var enabledcustomerresponse = await client.GetEnabledEvents(customergraphid, startcustomerresponse.Simid);
                 var dcrevent = RandomEvent.GetRandomEvent(enabledcustomerresponse.DCRevents);
-                // var dcrevent = enabledeventsresponse.DCRevents.First(p => p.EventID == "pengeoverfoersel");
                 var valuedict = await client.ExecuteValueEvent(customergraphid, startcustomerresponse.Simid, dcrevent.EventID, "0");
-                // AnsiConsole.WriteLine($"Event: {dcrevent.Label} with value: {valuedict[dcrevent.EventID]} & ClientID: {client.ClientID()}");
                 var enableddetectorresponse = await client.GetEnabledEvents(detectorgraphid, startdetectorresponse.Simid);
                 var detectoreventid = dcrevent.EventID;
                 dcrevent = enableddetectorresponse.DCRevents.First(p => p.Label == dcrevent.Label);
@@ -122,7 +120,7 @@ namespace Bachelor.MQTT.Producer
                     AddRow(table, j, dcrevent.Label);
                     await client.ExecuteValueEvent(detectorgraphid, startdetectorresponse.Simid, dcrevent.EventID, "0"); // don't need to store result
                 }
-                ctx.Refresh();
+                if (i != 4) ctx.Refresh(); // If-statement needed so it renders final table correctly
                 await RunLazyUser(client, detectorgraphid, startdetectorresponse.Simid, table, j);
                 var log = await client.GetLog(detectorgraphid, startdetectorresponse.Simid);
                 if (log.Any(p => p.EventId == "KYC_ACTIVITY"))
