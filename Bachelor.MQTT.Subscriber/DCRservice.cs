@@ -86,7 +86,7 @@ public class DCRservice
         if (value != "0")
         {
             string xml = $"<globalStore><variable id=\"{eventid}\" type=\"integer\" value=\"{value}\" isNull=\"false\"/> </globalStore>";
-            DCRvariable json = new DCRvariable { DataXML = xml};
+            DCRvariable json = new DCRvariable { DataXML = xml };
             request.Content = JsonContent.Create(json); //new StringContent(string.Empty); 
 
         }
@@ -102,6 +102,14 @@ public class DCRservice
         return globalStoreDict;
     }
 
+    /// <summary>
+    /// Retrieves the simulation log
+    /// </summary>
+    /// <param name="graphid"></param>
+    /// <param name="simid"></param>
+    /// <param name="username"></param>
+    /// <param name="password"></param>
+    /// <returns>Array of log entries</returns>
     public async Task<LogEntry[]> GetLog(string graphid, string simid, string username, string password)
     {
         var request = new HttpRequestMessage(HttpMethod.Get, $"/api/graphs/{graphid}/sims/{simid}/log");
@@ -113,6 +121,11 @@ public class DCRservice
         return content!;
     }
 
+    /// <summary>
+    /// Function to extract the "globalStore" from xml. Each value-event.
+    /// </summary>
+    /// <param name="content"></param>
+    /// <returns>Dictionary with event id as key and value as value</returns>
     public Dictionary<string, string> GetGlobalStore(string content)
     {
         var parsed = XElement.Parse(content);

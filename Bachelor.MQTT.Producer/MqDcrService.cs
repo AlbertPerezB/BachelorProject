@@ -157,13 +157,15 @@ public class MqDcrService : IDisposable
         await _client.PublishAsync(msg).ConfigureAwait(false);
         await tcs.Task;
     }
-    
+
     /// <summary>
-    /// Executes an event, thus updating graph and enabled events  
+    /// Executes an event with a value, thus updating graph and enabled events  
     /// </summary>
     /// <param name="graphid"></param>
     /// <param name="simid"></param>
     /// <param name="eventid"></param>
+    /// <returns>A dictionary containing all value events</returns>
+
     public async Task<Dictionary<string, string>> ExecuteValueEvent(string graphid, string simid, string eventid, string value)
     {
         var msg = new MQTT5PublishMessage("DCR/ExecuteValueEvent", QualityOfService.ExactlyOnceDelivery); // Can change qos later
@@ -216,6 +218,12 @@ public class MqDcrService : IDisposable
         await tcs.Task;
     }
 
+    /// <summary>
+    /// Function for retrieving the simulation log
+    /// </summary>
+    /// <param name="graphid"></param>
+    /// <param name="simid"></param>
+    /// <returns>The log in array form</returns>
     public async Task<LogEntry[]> GetLog(string graphid, string simid)
     {
         var msg = new MQTT5PublishMessage("DCR/GetLog", QualityOfService.ExactlyOnceDelivery); // Can change qos later

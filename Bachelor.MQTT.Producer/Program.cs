@@ -73,6 +73,16 @@ namespace Bachelor.MQTT.Producer
                 });
         }
 
+        /// <summary>
+        /// Function that creates 3 clients, starts a simulation on each and waits for them all to finish
+        /// </summary>
+        /// <param name="hivemqconfig"></param>
+        /// <param name="dcrconfig"></param>
+        /// <param name="detectorgraphid"></param>
+        /// <param name="customergraphid"></param>
+        /// <param name="tasklist"></param>
+        /// <param name="table"></param>
+        /// <param name="ctx"></param>
         private static async Task RunClient(HiveMQConfig hivemqconfig, DCRconfig dcrconfig, string detectorgraphid, string customergraphid, List<Task> tasklist, Table table, LiveDisplayContext ctx)
         {
             Task t1 = CreateClient(hivemqconfig, dcrconfig, detectorgraphid, customergraphid, table, ctx, 0);
@@ -83,6 +93,16 @@ namespace Bachelor.MQTT.Producer
             table.Caption("All producers done");
         }
 
+        /// <summary>
+        /// Runs a hivemq producer client
+        /// </summary>
+        /// <param name="hivemqconfig"></param>
+        /// <param name="dcrconfig"></param>
+        /// <param name="detectorgraphid"></param>
+        /// <param name="customergraphid"></param>
+        /// <param name="table"></param>
+        /// <param name="ctx"></param>
+        /// <param name="number"></param>
         private static Task CreateClient(HiveMQConfig hivemqconfig, DCRconfig dcrconfig, string detectorgraphid, string customergraphid, Table table, LiveDisplayContext ctx, int number)
         {
             return Task.Run(async () =>
@@ -90,7 +110,16 @@ namespace Bachelor.MQTT.Producer
                 await ExecuteSimulation(hivemqconfig, dcrconfig, detectorgraphid, customergraphid, table, ctx, number);
             });
         }
-
+        /// <summary>
+        /// Connects client to broker and sets up subscriptions. Then runs the simulation.
+        /// </summary>
+        /// <param name="hivemqconfig"></param>
+        /// <param name="dcrconfig"></param>
+        /// <param name="detectorgraphid"></param>
+        /// <param name="customergraphid"></param>
+        /// <param name="table"></param>
+        /// <param name="ctx"></param>
+        /// <param name="j"></param>
         private static async Task ExecuteSimulation(HiveMQConfig hivemqconfig, DCRconfig dcrconfig, string detectorgraphid, string customergraphid, Table table, LiveDisplayContext ctx, int j)
         {
             var susflag = false;
@@ -134,6 +163,12 @@ namespace Bachelor.MQTT.Producer
             if (susflag) AddRow(table, j, "[red]SUS DETECTED!!![/]");
             else AddRow(table, j, "[green]Finished with no sus![/]");
         }
+        /// <summary>
+        /// Add a row to the Spectre table
+        /// </summary>
+        /// <param name="table"></param>
+        /// <param name="j"></param>
+        /// <param name="message"></param>
         private static void AddRow(Table table, int j, string message)
         {
             table.AddRow(j == 0 ? message : string.Empty,

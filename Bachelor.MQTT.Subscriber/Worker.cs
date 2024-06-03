@@ -101,7 +101,7 @@ public class Worker : BackgroundService
                     break;
                 case var p when p == "DCR/GetLog":
                     await GetLog(e, client);
-                    break;    
+                    break;
             }
         };
         var builder = new SubscribeOptionsBuilder();
@@ -124,7 +124,6 @@ public class Worker : BackgroundService
     /// </summary>
     /// <param name="e"></param>
     /// <param name="client"></param>
-    /// <returns></returns>
     private async Task StartSimulation(OnMessageReceivedEventArgs e, HiveMQClient client)
     {
         var request = JsonSerializer.Deserialize<StartSimulationRequest>(e.PublishMessage.PayloadAsString);
@@ -141,7 +140,6 @@ public class Worker : BackgroundService
     /// </summary>
     /// <param name="e"></param>
     /// <param name="client"></param>
-    /// <returns></returns>
     private async Task GetEnabledEvents(OnMessageReceivedEventArgs e, HiveMQClient client)
     {
         var request = JsonSerializer.Deserialize<GetEnabledEventsRequest>(e.PublishMessage.PayloadAsString);
@@ -171,27 +169,26 @@ public class Worker : BackgroundService
     /// </summary>
     /// <param name="e"></param>
     /// <param name="client"></param>
-    /// <returns></returns>
-    private async Task ExecuteEvent(OnMessageReceivedEventArgs e, HiveMQClient client) {
+    private async Task ExecuteEvent(OnMessageReceivedEventArgs e, HiveMQClient client)
+    {
         var request = JsonSerializer.Deserialize<ExecuteEventRequest>(e.PublishMessage.PayloadAsString);
         await _dcrservice.ExecuteEvent(request!.Graphid, request.Simid, request.EventID, GetUsername(e.PublishMessage), GetPassword(e.PublishMessage));
-    
+
         var msg = new MQTT5PublishMessage(e.PublishMessage.ResponseTopic!, QualityOfService.ExactlyOnceDelivery);
         msg.CorrelationData = e.PublishMessage.CorrelationData;
         msg.PayloadAsString = string.Empty;
-        await client.PublishAsync(msg);  
+        await client.PublishAsync(msg);
     }
 
     /// <summary>
-    /// Calls the ExecuteValueEvent from dcrservice and publishes the response message (string.Empty)
+    /// Calls the ExecuteValueEvent from dcrservice and publishes serialized dictionary of values 
     /// </summary>
     /// <param name="e"></param>
     /// <param name="client"></param>
-    /// <returns></returns>
     private async Task ExecuteValueEvent(OnMessageReceivedEventArgs e, HiveMQClient client)
     {
         var request = JsonSerializer.Deserialize<ExecuteValueEventRequest>(e.PublishMessage.PayloadAsString);
-        var executeDict = await _dcrservice.ExecuteValueEvent(request!.Graphid, request.Simid, request.EventID, 
+        var executeDict = await _dcrservice.ExecuteValueEvent(request!.Graphid, request.Simid, request.EventID,
             GetUsername(e.PublishMessage), GetPassword(e.PublishMessage), request.Value);
 
         var msg = new MQTT5PublishMessage(e.PublishMessage.ResponseTopic!, QualityOfService.ExactlyOnceDelivery);
@@ -205,7 +202,6 @@ public class Worker : BackgroundService
     /// </summary>
     /// <param name="e"></param>
     /// <param name="client"></param>
-    /// <returns></returns>
     private async Task Terminate(OnMessageReceivedEventArgs e, HiveMQClient client)
     {
         var request = JsonSerializer.Deserialize<TerminateRequest>(e.PublishMessage.PayloadAsString);
@@ -217,7 +213,14 @@ public class Worker : BackgroundService
         await client.PublishAsync(msg);
     }
 
-    private async Task GetLog(OnMessageReceivedEventArgs e, HiveMQClient client) {
+    /// <summary>
+    /// Calls the GetLog from dcrservice and publishes the serialized log
+    /// </summary>
+    /// <param name="e"></param>
+    /// <param name="client"></param>
+    /// <returns></returns>
+    private async Task GetLog(OnMessageReceivedEventArgs e, HiveMQClient client)
+    {
         var request = JsonSerializer.Deserialize<GetLogRequest>(e.PublishMessage.PayloadAsString);
         var log = await _dcrservice.GetLog(request!.Graphid, request.Simid, GetUsername(e.PublishMessage), GetPassword(e.PublishMessage));
 
