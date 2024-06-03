@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Bachelor.MQTT.Producer")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+701c0dfde89769b1cc69551524ffb42f256ea074")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8c8adb728fa17d44c658e07013732126077ee27c")]
 [assembly: System.Reflection.AssemblyProductAttribute("Bachelor.MQTT.Producer")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Bachelor.MQTT.Producer")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

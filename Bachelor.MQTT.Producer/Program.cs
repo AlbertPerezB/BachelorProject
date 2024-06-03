@@ -79,7 +79,6 @@ namespace Bachelor.MQTT.Producer
             Task t2 = CreateClient(hivemqconfig, dcrconfig, detectorgraphid, customergraphid, table, ctx, 1);
             Task t3 = CreateClient(hivemqconfig, dcrconfig, detectorgraphid, customergraphid, table, ctx, 2);
 
-
             await Task.WhenAll(t1, t2, t3).ConfigureAwait(false);
             table.Caption("All producers done");
         }
@@ -113,21 +112,24 @@ namespace Bachelor.MQTT.Producer
                 var enableddetectorresponse = await client.GetEnabledEvents(detectorgraphid, startdetectorresponse.Simid);
                 var detectoreventid = dcrevent.EventID;
                 dcrevent = enableddetectorresponse.DCRevents.First(p => p.Label == dcrevent.Label);
-                AddRow(table, j, dcrevent.Label + ": " + valuedict[detectoreventid]);
+                try
+                {
+                    AddRow(table, j, dcrevent.Label + ": " + valuedict[detectoreventid]);
+                    await client.ExecuteValueEvent(detectorgraphid, startdetectorresponse.Simid, dcrevent.EventID, valuedict[detectoreventid]); // don't need to store result
+                }
+                catch (KeyNotFoundException)
+                {
+                    AddRow(table, j, dcrevent.Label);
+                    await client.ExecuteValueEvent(detectorgraphid, startdetectorresponse.Simid, dcrevent.EventID, "0"); // don't need to store result
+                }
                 ctx.Refresh();
-                await client.ExecuteValueEvent(detectorgraphid, startdetectorresponse.Simid, dcrevent.EventID, valuedict[detectoreventid]); // don't need to store result
                 await RunLazyUser(client, detectorgraphid, startdetectorresponse.Simid, table, j);
                 var log = await client.GetLog(detectorgraphid, startdetectorresponse.Simid);
                 if (log.Any(p => p.EventId == "KYC_ACTIVITY"))
                 {
-                    // Thread.Sleep(2500);
                     await client.Terminate(detectorgraphid, startdetectorresponse.Simid);
                     await client.Terminate(customergraphid, startcustomerresponse.Simid);
                     susflag = true;
-
-                    // AnsiConsole.Clear();
-                    // ShowFlashingMessage("SUS DETECTED!", 8);
-                    // Console.ReadLine();
                     break;
                 }
             }
