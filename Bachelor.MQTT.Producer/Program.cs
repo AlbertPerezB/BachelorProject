@@ -178,11 +178,7 @@ namespace Bachelor.MQTT.Producer
 
         /// <summary>
         /// Sets ud the configuration, adding the appsettings file and environment variables
-        /// </summary>
-        /// <returns></returns> <summary>
-        /// The IConfigurationRoot which the builder returns
-        /// </summary>
-        /// <returns></returns>
+        /// <returns> The IConfigurationRoot which the builder returns </returns>
         private static IConfigurationRoot BuildConfig()
         {
             var builder = new ConfigurationBuilder()
@@ -190,6 +186,14 @@ namespace Bachelor.MQTT.Producer
             .AddEnvironmentVariables();
             return builder.Build();
         }
+        /// <summary>
+        /// Exectues all pending events and adds row in table with yellow text.
+        /// </summary>
+        /// <param name="client"></param>
+        /// <param name="graphid"></param>
+        /// <param name="simid"></param>
+        /// <param name="table"></param>
+        /// <param name="j"></param>
         private static async Task RunLazyUser(MqDcrService client, string graphid, string simid, Table table, int j)
         {
             var flag = true;

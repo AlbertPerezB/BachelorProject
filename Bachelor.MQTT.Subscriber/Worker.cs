@@ -218,7 +218,6 @@ public class Worker : BackgroundService
     /// </summary>
     /// <param name="e"></param>
     /// <param name="client"></param>
-    /// <returns></returns>
     private async Task GetLog(OnMessageReceivedEventArgs e, HiveMQClient client)
     {
         var request = JsonSerializer.Deserialize<GetLogRequest>(e.PublishMessage.PayloadAsString);
