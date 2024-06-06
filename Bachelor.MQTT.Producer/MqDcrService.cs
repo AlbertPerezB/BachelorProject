@@ -212,7 +212,7 @@ public class MqDcrService : IDisposable
         _responses.TryAdd(key, tcs);
         msg.CorrelationData = key.ToByteArray();
         msg.ResponseTopic = "DCR/Terminate/" + _client.Options.ClientId;
-        var request = new GetEnabledEventsRequest { Graphid = graphid, Simid = simid };
+        var request = new TerminateRequest { Graphid = graphid, Simid = simid };
         msg.PayloadAsString = JsonSerializer.Serialize(request);
         await _client.PublishAsync(msg).ConfigureAwait(false);
         await tcs.Task;
