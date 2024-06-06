@@ -1,4 +1,5 @@
 using System.Text;
+using Bachelor.MQTT.Shared;
 using Bachelor.MQTT.Subscriber;
 
 var host = Host.CreateDefaultBuilder(args)

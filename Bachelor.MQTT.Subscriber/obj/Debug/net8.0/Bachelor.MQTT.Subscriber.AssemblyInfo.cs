@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Bachelor.MQTT.Subscriber")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2f9ba77fa8dee659ee169bd186d2308cf77ddcac")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+89981e16331da261e8848d2a99fa52d3a60e6b0a")]
 [assembly: System.Reflection.AssemblyProductAttribute("Bachelor.MQTT.Subscriber")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Bachelor.MQTT.Subscriber")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
