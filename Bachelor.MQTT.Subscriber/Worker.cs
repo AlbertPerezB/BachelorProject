@@ -105,12 +105,12 @@ public class Worker : BackgroundService
             }
         };
         var builder = new SubscribeOptionsBuilder();
-        builder.WithSubscription("$share/dcrgroup/DCR/StartSimulation", QualityOfService.AtLeastOnceDelivery)
-        .WithSubscription("$share/dcrgroup/DCR/GetEnabledEvents", QualityOfService.AtLeastOnceDelivery)
-        .WithSubscription("$share/dcrgroup/DCR/ExecuteEvent", QualityOfService.AtLeastOnceDelivery)
-        .WithSubscription("$share/dcrgroup/DCR/ExecuteValueEvent", QualityOfService.AtLeastOnceDelivery)
-        .WithSubscription("$share/dcrgroup/DCR/Terminate", QualityOfService.AtLeastOnceDelivery)
-        .WithSubscription("$share/dcrgroup/DCR/GetLog", QualityOfService.AtLeastOnceDelivery);
+        builder.WithSubscription("DCR/StartSimulation", QualityOfService.AtLeastOnceDelivery)
+        .WithSubscription("DCR/GetEnabledEvents", QualityOfService.AtLeastOnceDelivery)
+        .WithSubscription("DCR/ExecuteEvent", QualityOfService.AtLeastOnceDelivery)
+        .WithSubscription("DCR/ExecuteValueEvent", QualityOfService.AtLeastOnceDelivery)
+        .WithSubscription("DCR/Terminate", QualityOfService.AtLeastOnceDelivery)
+        .WithSubscription("DCR/GetLog", QualityOfService.AtLeastOnceDelivery);
 
         var subscribeoptions = builder.Build();
 

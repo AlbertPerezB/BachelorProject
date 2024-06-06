@@ -67,7 +67,7 @@ namespace Bachelor.MQTT.Producer
                 .Overflow(VerticalOverflow.Visible) // Show ellipsis when overflowing
                 .StartAsync(async ctx =>
                 {
-                    await RunClient(hivemqconfig, dcrconfig, detectorgraphid, customergraphid, tasklist, table, ctx).ConfigureAwait(false);
+                    await RunClients(hivemqconfig, dcrconfig, detectorgraphid, customergraphid, tasklist, table, ctx).ConfigureAwait(false);
                     ctx.Refresh();
                     Console.ReadLine();
                 });
@@ -83,7 +83,7 @@ namespace Bachelor.MQTT.Producer
         /// <param name="tasklist"></param>
         /// <param name="table"></param>
         /// <param name="ctx"></param>
-        private static async Task RunClient(HiveMQConfig hivemqconfig, DCRconfig dcrconfig, string detectorgraphid, string customergraphid, List<Task> tasklist, Table table, LiveDisplayContext ctx)
+        private static async Task RunClients(HiveMQConfig hivemqconfig, DCRconfig dcrconfig, string detectorgraphid, string customergraphid, List<Task> tasklist, Table table, LiveDisplayContext ctx)
         {
             Task t1 = CreateClient(hivemqconfig, dcrconfig, detectorgraphid, customergraphid, table, ctx, 0);
             Task t2 = CreateClient(hivemqconfig, dcrconfig, detectorgraphid, customergraphid, table, ctx, 1);
@@ -110,6 +110,7 @@ namespace Bachelor.MQTT.Producer
                 await ExecuteSimulation(hivemqconfig, dcrconfig, detectorgraphid, customergraphid, table, ctx, number);
             });
         }
+
         /// <summary>
         /// Connects client to broker and sets up subscriptions. Then runs the simulation.
         /// </summary>
@@ -163,6 +164,7 @@ namespace Bachelor.MQTT.Producer
             if (susflag) AddRow(table, j, "[red]SUS DETECTED!!![/]");
             else AddRow(table, j, "[green]Finished with no sus![/]");
         }
+
         /// <summary>
         /// Add a row to the Spectre table
         /// </summary>
@@ -186,6 +188,7 @@ namespace Bachelor.MQTT.Producer
             .AddEnvironmentVariables();
             return builder.Build();
         }
+        
         /// <summary>
         /// Exectues all pending events and adds row in table with yellow text.
         /// </summary>
@@ -205,21 +208,9 @@ namespace Bachelor.MQTT.Producer
                 {
                     await client.ExecuteEvent(graphid, simid, item.EventID);
                     AddRow(table, j, $"[yellow4]{item.Label}[/]");
-                    // AnsiConsole.WriteLine($"Event: {item.Label} & ClientID: {client.ClientID()} (executed by Lazy User)");
                     flag = true;
                 }
             }
         }
-
-        // private static DCRevent SelectEvent(DCRevent[] events)
-        // {
-        //     return AnsiConsole.Prompt(
-        //     new SelectionPrompt<DCRevent>()
-        //         .Title("Select an event")
-        //         .PageSize(10)
-        //         .MoreChoicesText("[grey](Move up and down to reveal more events)[/]")
-        //         .UseConverter(p => p.Label)
-        //         .AddChoices(events));
-        // }
     }
 }
