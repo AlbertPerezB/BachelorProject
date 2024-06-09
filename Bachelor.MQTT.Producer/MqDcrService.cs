@@ -52,12 +52,12 @@ public class MqDcrService : IDisposable
     public async Task SetUpSubscriptions()
     {
         var builder = new SubscribeOptionsBuilder();
-        builder.WithSubscription("DCR/StartSimulation/" + _client.Options.ClientId, HiveMQtt.MQTT5.Types.QualityOfService.AtMostOnceDelivery)
-        .WithSubscription("DCR/GetEnabledEvents/" + _client.Options.ClientId, HiveMQtt.MQTT5.Types.QualityOfService.AtMostOnceDelivery)
-        .WithSubscription("DCR/ExecuteEvent/" + _client.Options.ClientId, HiveMQtt.MQTT5.Types.QualityOfService.AtMostOnceDelivery)
-        .WithSubscription("DCR/ExecuteValueEvent/" + _client.Options.ClientId, HiveMQtt.MQTT5.Types.QualityOfService.AtMostOnceDelivery)
-        .WithSubscription("DCR/Terminate/" + _client.Options.ClientId, HiveMQtt.MQTT5.Types.QualityOfService.AtMostOnceDelivery)
-        .WithSubscription("DCR/GetLog/" + _client.Options.ClientId, HiveMQtt.MQTT5.Types.QualityOfService.AtMostOnceDelivery);
+        builder.WithSubscription("DCR/StartSimulation/" + _client.Options.ClientId, HiveMQtt.MQTT5.Types.QualityOfService.ExactlyOnceDelivery)
+        .WithSubscription("DCR/GetEnabledEvents/" + _client.Options.ClientId, HiveMQtt.MQTT5.Types.QualityOfService.ExactlyOnceDelivery)
+        .WithSubscription("DCR/ExecuteEvent/" + _client.Options.ClientId, HiveMQtt.MQTT5.Types.QualityOfService.ExactlyOnceDelivery)
+        .WithSubscription("DCR/ExecuteValueEvent/" + _client.Options.ClientId, HiveMQtt.MQTT5.Types.QualityOfService.ExactlyOnceDelivery)
+        .WithSubscription("DCR/Terminate/" + _client.Options.ClientId, HiveMQtt.MQTT5.Types.QualityOfService.ExactlyOnceDelivery)
+        .WithSubscription("DCR/GetLog/" + _client.Options.ClientId, HiveMQtt.MQTT5.Types.QualityOfService.ExactlyOnceDelivery);
         var subscribeoptions = builder.Build();
 
         _client.OnMessageReceived += (s, e) =>
@@ -77,7 +77,7 @@ public class MqDcrService : IDisposable
     /// <returns>A response instance with the simID</returns>
     public async Task<StartSimulationResponse> StartSimulation(string graphid)
     {
-        var msg = new MQTT5PublishMessage("DCR/StartSimulation", QualityOfService.AtMostOnceDelivery); // Can change qos later
+        var msg = new MQTT5PublishMessage("DCR/StartSimulation", QualityOfService.ExactlyOnceDelivery); 
         SetCredentials(msg);
         var key = Guid.NewGuid();
         var tcs = new TaskCompletionSource<string>();
@@ -107,7 +107,7 @@ public class MqDcrService : IDisposable
     /// <returns>Response instance with events, isaccepting and so on</returns>
     public async Task<GetEnabledEventsResponse> GetEnabledEvents(string graphid, string simid)
     {
-        var msg = new MQTT5PublishMessage("DCR/GetEnabledEvents", QualityOfService.ExactlyOnceDelivery); // Can change qos later
+        var msg = new MQTT5PublishMessage("DCR/GetEnabledEvents", QualityOfService.ExactlyOnceDelivery); 
         SetCredentials(msg);
         var key = Guid.NewGuid();
         var tcs = new TaskCompletionSource<string>();
@@ -137,7 +137,7 @@ public class MqDcrService : IDisposable
     /// <param name="eventid"></param>
     public async Task ExecuteEvent(string graphid, string simid, string eventid)
     {
-        var msg = new MQTT5PublishMessage("DCR/ExecuteEvent", QualityOfService.ExactlyOnceDelivery); // Can change qos later
+        var msg = new MQTT5PublishMessage("DCR/ExecuteEvent", QualityOfService.ExactlyOnceDelivery); 
         SetCredentials(msg);
         var key = Guid.NewGuid();
         var tcs = new TaskCompletionSource<string>();
@@ -168,7 +168,7 @@ public class MqDcrService : IDisposable
 
     public async Task<Dictionary<string, string>> ExecuteValueEvent(string graphid, string simid, string eventid, string value)
     {
-        var msg = new MQTT5PublishMessage("DCR/ExecuteValueEvent", QualityOfService.ExactlyOnceDelivery); // Can change qos later
+        var msg = new MQTT5PublishMessage("DCR/ExecuteValueEvent", QualityOfService.ExactlyOnceDelivery); 
         SetCredentials(msg);
         var key = Guid.NewGuid();
         var tcs = new TaskCompletionSource<string>();
@@ -197,7 +197,7 @@ public class MqDcrService : IDisposable
     /// <param name="simid"></param>
     public async Task Terminate(string graphid, string simid)
     {
-        var msg = new MQTT5PublishMessage("DCR/Terminate", QualityOfService.ExactlyOnceDelivery); // Can change qos later
+        var msg = new MQTT5PublishMessage("DCR/Terminate", QualityOfService.ExactlyOnceDelivery); 
         SetCredentials(msg);
         var key = Guid.NewGuid();
         var tcs = new TaskCompletionSource<string>();
@@ -226,7 +226,7 @@ public class MqDcrService : IDisposable
     /// <returns>The log in array form</returns>
     public async Task<LogEntry[]> GetLog(string graphid, string simid)
     {
-        var msg = new MQTT5PublishMessage("DCR/GetLog", QualityOfService.ExactlyOnceDelivery); // Can change qos later
+        var msg = new MQTT5PublishMessage("DCR/GetLog", QualityOfService.ExactlyOnceDelivery); 
         SetCredentials(msg);
         var key = Guid.NewGuid();
         var tcs = new TaskCompletionSource<string>();

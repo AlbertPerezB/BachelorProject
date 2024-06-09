@@ -188,7 +188,6 @@ namespace Bachelor.MQTT.Producer
             .AddEnvironmentVariables();
             return builder.Build();
         }
-        
         /// <summary>
         /// Exectues all pending events and adds row in table with yellow text.
         /// </summary>
